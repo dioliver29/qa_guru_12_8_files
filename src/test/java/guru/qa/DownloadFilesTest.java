@@ -4,6 +4,8 @@ import com.codeborne.pdftest.PDF;
 import com.codeborne.pdftest.matchers.ContainsExactText;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.xlstest.XLS;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.opencsv.CSVReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -109,6 +111,22 @@ public class DownloadFilesTest {
                         new String[]{"some second line", "another second line"}
                 );
             }
+        }
+    }
+
+    @Test
+    void jsonTest() throws Exception {
+        Gson gson = new Gson();
+        try (InputStream stream = cl.getResourceAsStream("filesfortest/sample.json")) {
+            assert stream != null;
+            String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+            assertThat(jsonObject.get("fruit").getAsString()).isEqualTo("Apple");
+            assertThat(jsonObject.get("properties")
+                    .getAsJsonObject()
+                    .get("size").getAsString())
+                    .isEqualTo("Large");
+
         }
     }
 }

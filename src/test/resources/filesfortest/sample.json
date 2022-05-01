@@ -1,0 +1,12 @@
+{
+  "fruit": "Apple",
+  "properties": {
+    "size": "Large",
+    "color": "Red"
+  },
+  "sorts": [
+    "grenny",
+    "new",
+    "old"
+  ]
+}
