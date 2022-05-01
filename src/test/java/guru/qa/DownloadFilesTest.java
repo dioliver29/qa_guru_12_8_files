@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -28,7 +29,7 @@ public class DownloadFilesTest {
     void zipParsingTest() throws Exception {
 
         ZipFile zf = new ZipFile(new File("src/test/resources/filesfortest/files.zip"));
-        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream("filesfortest/files.zip"));
+        ZipInputStream is = new ZipInputStream(Objects.requireNonNull(cl.getResourceAsStream("filesfortest/files.zip")));
         ZipEntry entry;
         while((entry = is.getNextEntry()) !=null) {
             if(entry.getName().contains("csvExample.csv")) {
@@ -78,6 +79,7 @@ public class DownloadFilesTest {
     @Test
     void pdfParsingTest() throws Exception {
         try (InputStream stream =cl.getResourceAsStream("filesfortest/junit-user-guide-5.8.2.pdf")) {
+            assert stream != null;
             PDF pdf = new PDF(stream);
             Assertions.assertEquals(166, pdf.numberOfPages);
             assertThat(pdf, new ContainsExactText("123"));
@@ -87,6 +89,7 @@ public class DownloadFilesTest {
     @Test
     void xlsParsingTest() throws Exception {
         try (InputStream stream = cl.getResourceAsStream("filesfortest/example.xlsx")) {
+            assert stream != null;
             XLS xls = new XLS(stream);
             String stringCellValue = xls.excel.getSheetAt(1).getRow(3).getCell(1).getStringCellValue();
             assertThat(stringCellValue).contains("surname 4");
@@ -96,14 +99,16 @@ public class DownloadFilesTest {
 
     @Test
     void csvParsingTest() throws Exception{
-        try (InputStream stream = cl.getResourceAsStream("filesfortest/csvExample.csv");
-             CSVReader reader = new CSVReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+        try (InputStream stream = cl.getResourceAsStream("filesfortest/csvExample.csv")) {
+            assert stream != null;
+            try (CSVReader reader = new CSVReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 
-            List<String[]> content = reader.readAll();
-            assertThat(content).contains(
-                    new String[]{"some line", "another line"},
-                    new String[]{"some second line", "another second line"}
-            );
+                List<String[]> content = reader.readAll();
+                assertThat(content).contains(
+                        new String[]{"some line", "another line"},
+                        new String[]{"some second line", "another second line"}
+                );
+            }
         }
     }
 }
